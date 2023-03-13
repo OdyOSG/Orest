@@ -36,3 +36,26 @@ placeTmpMeasurementMappedTable <- function(
       units_mapping = tableName
     )
   }
+
+
+
+prepareMap <- function(
+    listOfSources,
+    connection,
+    cdmSchema
+) {
+  mp_dt1 <- purrr::map_dfr(
+    listOfSources,
+    ~data.table::data.table(readRDS(here::here('R/units_mapped.Rd')))[source_code == .x,]
+  )
+  checkValidity <- DatabaseConnector::renderTranslateQuerySql(
+    connction,
+    "select concept_id from @cdm_schema.concept where concept_id in (@concept_ids)
+     and standard_concept = 'S'",
+    concept_ids = mp_dt1$concept_id,
+    cdm_schema = cdmSchema
+  )[ ,1]
+  return(mp_dt1[concept_id %in% checkValidity, ])
+}
+
+
