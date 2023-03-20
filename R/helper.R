@@ -1,3 +1,4 @@
-getMappingMask <- function() {  unitsMapped <- read.csv(here::here("inst/csv/units_mapped.csv"))[,c('source_code', 'concept_code')]}
+getMp <- function() readRDS(here::here("R/units_mapped.Rd"))
+getConv <- function() {readRDS(here::here("R/conversion.Rd"))}
 
 

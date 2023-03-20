@@ -62,10 +62,7 @@ CREATE TABLE @write_schema.@measurement_tmp_tbl (
 			m.unit_source_value,
 			m.value_source_value
   FROM @cdm_schema.measurement m
-  INNER JOIN @write_schema.@units_mapping u
-  ON source_code = unit_source_value
   WHERE measurement_concept_id
   IN (@target_measurement_concept_ids) AND
   value_as_number IS NOT NULL AND
-  unit_concept_id IS NULL AND
-  unit_source_value IS NOT NULL
+  unit_source_value IS NOT NULL --AND unit_concept_id = 0

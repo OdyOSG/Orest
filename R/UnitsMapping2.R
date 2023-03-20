@@ -1,8 +1,15 @@
 #' @export
+#' @title placeTmpMeasurementMappedTable
+#' @description This function will create a table with measurements that did not have a unit of measurement and will map source value using the Odysseus Data Services mapping date
+#' @param measurementName optional parameter prefix name of tmp measurement talbe
+#' @param connectionDetails DatabaseConnector::createConnectionDetails S3 object
+#' @param cdmSchema cdm database schema
+#' @param writeSchema schema to write
+#' @param targetMeasurementConceptIds measurement concept ids to map
 #'
 #'
 placeTmpMeasurementMappedTable <- function(
-    measurementName,
+    measurementName = 'any',
     connectionDetails,
     cdmSchema,
     writeSchema,
@@ -45,9 +52,8 @@ placeTmpMeasurementMappedTable <- function(
     connection = connection,
     sql = SqlRender::readSql(here::here('inst/sql/SetUpMapping.sql')),
     write_schema = writeSchema,
-    measurement_tmp_tbl = paste0(measurementName , 'measurement_tmp_tbl')
+    measurement_tmp_tbl = paste0(measurementName , '_measurement_tmp_tbl')
   )
-
   ParallelLogger::logInfo(glue::glue('
   {separator}
   Map unmapped units
@@ -61,12 +67,15 @@ placeTmpMeasurementMappedTable <- function(
       SET unit_concept_id = @concept_id
       WHERE unit_source_value = @src',
       concept_id = cId,
-      measurement_tmp_tbl = paste0(measurementName , 'measurement_tmp_tbl'),
+      measurement_tmp_tbl = paste0(measurementName , '_measurement_tmp_tbl'),
       src = .x
       )})
 }
 
-
+#' @importFrom data.table data.table
+#' @importFrom data.table :=
+#' @importFrom arrow to_duckdb
+#' @importFrom rlang !!
 prepareMap <- function(
     listOfSources,
     connection,
@@ -75,7 +84,7 @@ prepareMap <- function(
 ) {
   mp_dt1 <- purrr::map_dfr(
     listOfSources,
-    ~data.table::data.table(getMp())[source_code == .x,]
+    ~data.table(getMp())[source_code == .x,]
   )[concept_id %in% unitConceptIds, ]
   checkValidity <- DatabaseConnector::renderTranslateQuerySql(
     connction,

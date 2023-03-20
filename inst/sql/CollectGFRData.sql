@@ -22,34 +22,62 @@ FROM  (
   where gender_concept_id IS NOT NULL AND year_of_birth IS NOT NULL AND race_concept_id IS NOT NULL
 ) cte
 JOIN (
-  SELECT measurement_id, measurement_date, person_id, value_as_number, concept_code, unit_source_value
-  FROM @cdm_schema.measurement m LEFT JOIN @cdm_schema.concept c ON m.unit_concept_id = c.concept_id
+  SELECT measurement_id, measurement_date, person_id, value_as_number, concept_code, unit_source_value,
+  unit_concept_id
+  FROM @cdm_schema.measurement m
+  LEFT JOIN @cdm_schema.concept c ON m.unit_concept_id = c.concept_id
   WHERE unit_source_value IS NOT NULL AND value_as_number > 0 AND value_as_number IS NOT NULL
   AND measurement_concept_id IN (@creatinine_concept_ids)
   ) cte2 ON cte.person_id = cte2.person_id
   WHERE year_of_birth  - measurement_date > 17;
 
-/*
-  creatinine <- ifelse (  creatinine_units == "mg/dl",
-              creatinine, # do nothing
-              ifelse(  creatinine_units == "micromol/l",
-                  creatinine / 88.4,
-                  ifelse(  creatinine_units == "mmol/l",
-                    1000 * creatinine / 88.4,
-                    NA # if any other undefined units is used, assume NA
-                  )
-              )
-            )
-*/
-
 SELECT CASE WHEN
- gender = 'f' and ethnicity = 'not_black' THEN
+--8861 mg/ml
+ gender = 'f' and ethnicity = 'not_black' and unit_concept_id = 8861 THEN
+  POWER(value_as_number * 88.4, -1.154) * POWER(age,-0.203) * 0.742
+  WHEN  gender = 'm' and ethnicity = 'not_black' and unit_concept_id = 8861  THEN
+  POWER(value_as_number * 88.4, -1.154) * POWER(age, -0.203)
+  WHEN  gender = 'f' and ethnicity = 'black' and unit_concept_id = 8861  THEN
+  POWER(value_as_number * 88.4, -1.154) * POWER(age, -0.203) * 0.742 * 1.212
+  WHEN  gender = 'm' and ethnicity = 'black' and unit_concept_id = 8861 THEN
+  POWER(value_as_number * 88.4, -1.154) * POWER(age,-0.203) * 1.212
+  --8753 - mmol/l
+gender = 'f' and ethnicity = 'not_black' and unit_concept_id = 8753 THEN
   POWER(value_as_number, -1.154) * POWER(age,-0.203) * 0.742
-  WHEN  gender = 'm' and ethnicity = 'not_black' THEN
+  WHEN  gender = 'm' and ethnicity = 'not_black' and unit_concept_id = 8753  THEN
   POWER(value_as_number, -1.154) * POWER(age, -0.203)
-  WHEN  gender = 'f' and ethnicity = 'black' THEN
+  WHEN  gender = 'f' and ethnicity = 'black' and unit_concept_id = 8753  THEN
   POWER(value_as_number, -1.154) * POWER(age, -0.203) * 0.742 * 1.212
-  WHEN  gender = 'm' and ethnicity = 'black' THEN
+  WHEN  gender = 'm' and ethnicity = 'black' and unit_concept_id = 8753 THEN
   POWER(value_as_number, -1.154) * POWER(age,-0.203) * 1.212
 
+--8749 umol/l
+gender = 'f' and ethnicity = 'not_black' and unit_concept_id = 8753 THEN
+  POWER(value_as_number * 1000, -1.154) * POWER(age,-0.203) * 0.742
+  WHEN  gender = 'm' and ethnicity = 'not_black' and unit_concept_id = 8753  THEN
+  POWER(value_as_number * 1000, -1.154) * POWER(age, -0.203)
+  WHEN  gender = 'f' and ethnicity = 'black' and unit_concept_id = 8753  THEN
+  POWER(value_as_number * 1000, -1.154) * POWER(age, -0.203) * 0.742 * 1.212
+  WHEN  gender = 'm' and ethnicity = 'black' and unit_concept_id = 8753 THEN
+  POWER(value_as_number * 1000, -1.154) * POWER(age,-0.203) * 1.212
 
+
+  END as gfr_value, measurement_date, person_id
+  FROM {write_schema}.{gfr_tmp_table} ;
+
+DROP {write_schema}.{gfr_tmp_table};
+/*
+# apply first set of coefficients for sex and creatinine
+  eGFR <- ifelse( sex %in% label_sex_female,
+                ifelse( creatinine <= 0.7,
+                       ( (creatinine / 0.7)^(-0.329) ) * (0.993^age),
+                       ( (creatinine / 0.7)^(-1.209) ) * (0.993^age)
+					  ),
+                ifelse( sex %in% label_sex_male,
+                        ifelse( creatinine <= 0.9,
+                               ( (creatinine / 0.9)^(-0.411) ) * (0.993^age),
+                               ( (creatinine / 0.9)^(-1.209) ) * (0.993^age)
+					          ),
+					   NA # if sex value is not corresponding neither to male nor female labels)
+                       )
+                )*/
