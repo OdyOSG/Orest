@@ -67,17 +67,34 @@ gender = 'f' and ethnicity = 'not_black' and unit_concept_id = 8753 THEN
 
 DROP {write_schema}.{gfr_tmp_table};
 /*
-# apply first set of coefficients for sex and creatinine
-  eGFR <- ifelse( sex %in% label_sex_female,
-                ifelse( creatinine <= 0.7,
-                       ( (creatinine / 0.7)^(-0.329) ) * (0.993^age),
-                       ( (creatinine / 0.7)^(-1.209) ) * (0.993^age)
-					  ),
-                ifelse( sex %in% label_sex_male,
-                        ifelse( creatinine <= 0.9,
-                               ( (creatinine / 0.9)^(-0.411) ) * (0.993^age),
-                               ( (creatinine / 0.9)^(-1.209) ) * (0.993^age)
-					          ),
-					   NA # if sex value is not corresponding neither to male nor female labels)
-                       )
+  eGFR <- ifelse( gender %in% genderFemale,
+                  ifelse( creatinine <= 0.7,
+                          ( (creatinine / 0.7)^(-0.329) ) * (0.993^age),
+                          ( (creatinine / 0.7)^(-1.209) ) * (0.993^age)
+                  ),
+                  ifelse( gender %in% genderMale,
+                          ifelse( creatinine <= 0.9,
+                                  ( (creatinine / 0.9)^(-0.411) ) * (0.993^age),
+                                  ( (creatinine / 0.9)^(-1.209) ) * (0.993^age)
+                          ),
+                          NA)
+  )
+  eGFR <- ifelse( rase %in% black,
+                  ifelse( gender %in% genderFemale,
+                          eGFR * 166,
+                          ifelse( gender %in% genderMale,
+                                  eGFR * 163,
+                                  NA
+                          )
+                  ),
+                  ifelse( gender %in% genderFemale,
+                          eGFR * 144,
+                          ifelse( gender %in% genderMale,
+                                  eGFR * 141,
+                                  NA)
+                  )
+  )
+
+  return (round(eGFR, 2))
+
                 )*/

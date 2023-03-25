@@ -1,4 +1,4 @@
-CREATE TABLE @write_schema.@measurement_tmp_tbl (
+CREATE TABLE if not exists @orestTmpSchema.@orestTmpMeasurementTable (
   measurement_id integer NOT NULL,
 			person_id integer NOT NULL,
 			measurement_concept_id integer NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE @write_schema.@measurement_tmp_tbl (
 			unit_source_value varchar(50) NULL,
 			value_source_value varchar(50) NULL)
     );
-  INSERT INTO   @write_schema.@measurement_tmp_tbl (
+  INSERT INTO   @orestTmpSchema.@orestTmpMeasurementTable (
       person_id,
 			measurement_concept_id,
 			measurement_date date,
@@ -63,6 +63,4 @@ CREATE TABLE @write_schema.@measurement_tmp_tbl (
 			m.value_source_value
   FROM @cdm_schema.measurement m
   WHERE measurement_concept_id
-  IN (@target_measurement_concept_ids) AND
-  value_as_number IS NOT NULL AND
-  unit_source_value IS NOT NULL --AND unit_concept_id = 0
+  IN (@target_measurement_concept_ids)

@@ -3,6 +3,8 @@
 export("%>%")
 export(convertSiToUs)
 export(convertUsToSi)
+export(eGlomerularFiltrationRateCkdEpi)
+export(getCohortDetailsOrest)
 export(placeTmpMeasurementMappedTable)
 importFrom(arrow,to_duckdb)
 importFrom(data.table,":=")
