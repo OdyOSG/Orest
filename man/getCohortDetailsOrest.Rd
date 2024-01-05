@@ -2,7 +2,7 @@
 % Please edit documentation in R/ReplaceMeasurements.R
 \name{getCohortDetailsOrest}
 \alias{getCohortDetailsOrest}
-\title{Get CohortDetails Orest (sql, concept ids)}
+\title{Get Orest Cohort Details  (sql with replaces measurement info, concept ids)}
 \usage{
 getCohortDetailsOrest(
   sqlCohortString,
