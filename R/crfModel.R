@@ -1,6 +1,3 @@
-# getModel <- function() readRDS('crfModel.Rd')
-
-
 #' @importFrom data.table shift
 #' @import crfsuite
 #' @import stringr
@@ -54,8 +51,7 @@ prepareTable <- function(tbl) {
 
 
 #' @export
-applyCrfModel <- function(preparedTable, pathToOrest) {
-
+applyCrfModels <- function(preparedTable, pathToOrest) {
   models <- list.files(here::here(pathToOrest, 'inst/models'), full.names = TRUE)
   pred <- purrr::map_dfc(
     models, ~predict(readRDS(.x),
@@ -71,20 +67,6 @@ applyCrfModel <- function(preparedTable, pathToOrest) {
                       ],
                       group = preparedTable$doc_id)
   )
-
-  # model <- readRDS(pathToTheModel)
-  # pred <- predict(model,
-  #         newdata = preparedTable[,
-  #                     c(
-  #                       "pos",
-  #                       "pos_previous",
-  #                       "pos_next",
-  #                       "token",
-  #                       "token_previous",
-  #                       "token_next",
-  #                       'upperLower')
-  #                     ],
-  #         group = preparedTable$doc_id)
   return(pred)
 }
 
