@@ -53,7 +53,7 @@ prepareTable <- function(tbl) {
 #' @export
 applyCrfModels <- function(preparedTable, pathToOrest) {
   models <- list.files(here::here(pathToOrest, 'inst/models'), full.names = TRUE)
-  pred <- purrr::map_dfc(
+  pred <- suppressMessages(purrr::map_dfc(
     models, ~predict(readRDS(.x),
                       newdata = preparedTable[,
                                               c(
@@ -66,7 +66,7 @@ applyCrfModels <- function(preparedTable, pathToOrest) {
                                                 'upperLower')
                       ],
                       group = preparedTable$doc_id)
-  )
+  ))
   return(pred)
 }
 
