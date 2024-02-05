@@ -76,3 +76,4 @@ for datum in tqdm(dat['test']['text']):
 ```
 
 [**GDrive Orest package link**]('https://drive.google.com/drive/folders/1m9MqutlelFXH9ac-Hx_SrPj0jAaSwrAI?usp=sharing)
+[**Presentation**](https://docs.google.com/presentation/d/1_OR9Qn7kT-ukn0h7LkKq1qGs1Y6xGThps_hD1Qpcel8/edit?usp=sharing)
