@@ -78,4 +78,4 @@ for datum in tqdm(dat['test']['text']):
     translation = [[tar_vocab.get_itos()[i] for i in mapped_sentence[0]] for mapped_sentence in mapped_sentence_ids]
     preds.append(' '.join([i for i in translation[0] if i not in ['<sos>', '<eos>', '<pad>', '<unk>']]))
 ```
-[GDrive Orest package link]('https://drive.google.com/drive/folders/1m9MqutlelFXH9ac-Hx_SrPj0jAaSwrAI?usp=sharing)
+[GDrive Orest package link](https://drive.google.com/drive/folders/1m9MqutlelFXH9ac-Hx_SrPj0jAaSwrAI?usp=sharing)
