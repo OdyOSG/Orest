@@ -3,9 +3,13 @@ title: "Orest Usage"
 author: "Alexander Alexeyuk"
 output: html_document
 ---
+[Presentation](https://docs.google.com/presentation/d/1_OR9Qn7kT-ukn0h7LkKq1qGs1Y6xGThps_hD1Qpcel8/edit?usp=sharing)
+
+
 
 ### Load source codes (for units mapping)
 #### install and import all required modules
+
 ```
 import sys
 !pip install datasets
@@ -74,7 +78,4 @@ for datum in tqdm(dat['test']['text']):
     translation = [[tar_vocab.get_itos()[i] for i in mapped_sentence[0]] for mapped_sentence in mapped_sentence_ids]
     preds.append(' '.join([i for i in translation[0] if i not in ['<sos>', '<eos>', '<pad>', '<unk>']]))
 ```
-
 [**GDrive Orest package link**]('https://drive.google.com/drive/folders/1m9MqutlelFXH9ac-Hx_SrPj0jAaSwrAI?usp=sharing)
-
-[**Presentation**](https://docs.google.com/presentation/d/1_OR9Qn7kT-ukn0h7LkKq1qGs1Y6xGThps_hD1Qpcel8/edit?usp=sharing)
