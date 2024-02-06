@@ -46,7 +46,7 @@ for datum in tqdm(dat['test']):
 
 
 
-### Load source codes (for units mapping)
+### Load source codes (for condition mapping)
 #### install and import all required modules
 ```
 import sys
